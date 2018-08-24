@@ -4,7 +4,7 @@
 #
 Name     : compat-libical-soname2
 Version  : 2.0.0
-Release  : 4
+Release  : 5
 URL      : https://github.com/libical/libical/archive/v2.0.0.tar.gz
 Source0  : https://github.com/libical/libical/archive/v2.0.0.tar.gz
 Summary  : An implementation of basic iCAL protocols
