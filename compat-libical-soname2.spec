@@ -4,14 +4,22 @@
 #
 Name     : compat-libical-soname2
 Version  : 2.0.0
-Release  : 6
+Release  : 7
 URL      : https://github.com/libical/libical/archive/v2.0.0.tar.gz
 Source0  : https://github.com/libical/libical/archive/v2.0.0.tar.gz
 Summary  : An implementation of basic iCAL protocols
 Group    : Development/Tools
 License  : BSD-3-Clause LGPL-2.1
-Requires: compat-libical-soname2-lib
-BuildRequires : cmake
+Requires: compat-libical-soname2-lib = %{version}-%{release}
+Requires: compat-libical-soname2-license = %{version}-%{release}
+BuildRequires : buildreq-cmake
+BuildRequires : buildreq-cpan
+BuildRequires : doxygen
+BuildRequires : icu4c-dev
+BuildRequires : perl
+BuildRequires : pkg-config
+BuildRequires : pkgconfig(gobject-introspection-1.0)
+Patch1: CVE-2016-9584.patch
 
 %description
 Arnout Engelen pointed out, that you could create a php libical wrapper:
@@ -25,8 +33,9 @@ standard (imho).
 %package dev
 Summary: dev components for the compat-libical-soname2 package.
 Group: Development
-Requires: compat-libical-soname2-lib
-Provides: compat-libical-soname2-devel
+Requires: compat-libical-soname2-lib = %{version}-%{release}
+Provides: compat-libical-soname2-devel = %{version}-%{release}
+Requires: compat-libical-soname2 = %{version}-%{release}
 
 %description dev
 dev components for the compat-libical-soname2 package.
@@ -35,39 +44,57 @@ dev components for the compat-libical-soname2 package.
 %package lib
 Summary: lib components for the compat-libical-soname2 package.
 Group: Libraries
+Requires: compat-libical-soname2-license = %{version}-%{release}
 
 %description lib
 lib components for the compat-libical-soname2 package.
 
 
+%package license
+Summary: license components for the compat-libical-soname2 package.
+Group: Default
+
+%description license
+license components for the compat-libical-soname2 package.
+
+
 %prep
 %setup -q -n libical-2.0.0
+%patch1 -p1
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
-export LANG=C
-export SOURCE_DATE_EPOCH=1509297617
-mkdir clr-build
+export LANG=C.UTF-8
+export SOURCE_DATE_EPOCH=1562627723
+mkdir -p clr-build
 pushd clr-build
-cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_SHARED_LIBS:BOOL=ON -DLIB_INSTALL_DIR:PATH=/usr/lib64 -DCMAKE_AR=/usr/bin/gcc-ar -DLIB_SUFFIX=64 -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_RANLIB=/usr/bin/gcc-ranlib
-make VERBOSE=1  %{?_smp_mflags}
+export GCC_IGNORE_WERROR=1
+export AR=gcc-ar
+export RANLIB=gcc-ranlib
+export NM=gcc-nm
+export CFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 -fstack-protector-strong -mzero-caller-saved-regs=used "
+export FCFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 -fstack-protector-strong -mzero-caller-saved-regs=used "
+export FFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 -fstack-protector-strong -mzero-caller-saved-regs=used "
+export CXXFLAGS="$CXXFLAGS -O3 -ffat-lto-objects -flto=4 -fstack-protector-strong -mzero-caller-saved-regs=used "
+%cmake ..
+make  %{?_smp_mflags} VERBOSE=1
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1509297617
+export SOURCE_DATE_EPOCH=1562627723
 rm -rf %{buildroot}
+mkdir -p %{buildroot}/usr/share/package-licenses/compat-libical-soname2
+cp COPYING %{buildroot}/usr/share/package-licenses/compat-libical-soname2/COPYING
+cp LICENSE %{buildroot}/usr/share/package-licenses/compat-libical-soname2/LICENSE
+cp debian/copyright %{buildroot}/usr/share/package-licenses/compat-libical-soname2/debian_copyright
 pushd clr-build
 %make_install
 popd
 
 %files
 %defattr(-,root,root,-)
-%exclude /usr/lib64/cmake/LibIcal/LibIcalConfig.cmake
-%exclude /usr/lib64/cmake/LibIcal/LibIcalConfigVersion.cmake
-%exclude /usr/lib64/cmake/LibIcal/LibIcalTargets-relwithdebinfo.cmake
-%exclude /usr/lib64/cmake/LibIcal/LibIcalTargets.cmake
 
 %files dev
 %defattr(-,root,root,-)
@@ -124,6 +151,10 @@ popd
 %exclude /usr/include/libical/vcc.h
 %exclude /usr/include/libical/vcomponent_cxx.h
 %exclude /usr/include/libical/vobject.h
+%exclude /usr/lib64/cmake/LibIcal/LibIcalConfig.cmake
+%exclude /usr/lib64/cmake/LibIcal/LibIcalConfigVersion.cmake
+%exclude /usr/lib64/cmake/LibIcal/LibIcalTargets-relwithdebinfo.cmake
+%exclude /usr/lib64/cmake/LibIcal/LibIcalTargets.cmake
 %exclude /usr/lib64/libical.so
 %exclude /usr/lib64/libical_cxx.so
 %exclude /usr/lib64/libicalss.so
@@ -143,3 +174,9 @@ popd
 /usr/lib64/libicalss_cxx.so.2.0.0
 /usr/lib64/libicalvcal.so.2
 /usr/lib64/libicalvcal.so.2.0.0
+
+%files license
+%defattr(0644,root,root,0755)
+/usr/share/package-licenses/compat-libical-soname2/COPYING
+/usr/share/package-licenses/compat-libical-soname2/LICENSE
+/usr/share/package-licenses/compat-libical-soname2/debian_copyright
