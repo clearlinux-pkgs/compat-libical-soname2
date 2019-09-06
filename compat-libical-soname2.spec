@@ -4,7 +4,7 @@
 #
 Name     : compat-libical-soname2
 Version  : 2.0.0
-Release  : 7
+Release  : 8
 URL      : https://github.com/libical/libical/archive/v2.0.0.tar.gz
 Source0  : https://github.com/libical/libical/archive/v2.0.0.tar.gz
 Summary  : An implementation of basic iCAL protocols
@@ -19,6 +19,8 @@ BuildRequires : icu4c-dev
 BuildRequires : perl
 BuildRequires : pkg-config
 BuildRequires : pkgconfig(gobject-introspection-1.0)
+# Suppress generation of debuginfo
+%global debug_package %{nil}
 Patch1: CVE-2016-9584.patch
 
 %description
@@ -29,17 +31,6 @@ bindings, it's not very hard to make a libical .so that
 can be accessed from PHP. Would be a valuable building
 block in the practical adoption of the iCalendar
 standard (imho).
-
-%package dev
-Summary: dev components for the compat-libical-soname2 package.
-Group: Development
-Requires: compat-libical-soname2-lib = %{version}-%{release}
-Provides: compat-libical-soname2-devel = %{version}-%{release}
-Requires: compat-libical-soname2 = %{version}-%{release}
-
-%description dev
-dev components for the compat-libical-soname2 package.
-
 
 %package lib
 Summary: lib components for the compat-libical-soname2 package.
@@ -67,7 +58,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1562627723
+export SOURCE_DATE_EPOCH=1567813031
 mkdir -p clr-build
 pushd clr-build
 export GCC_IGNORE_WERROR=1
@@ -83,7 +74,7 @@ make  %{?_smp_mflags} VERBOSE=1
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1562627723
+export SOURCE_DATE_EPOCH=1567813031
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/compat-libical-soname2
 cp COPYING %{buildroot}/usr/share/package-licenses/compat-libical-soname2/COPYING
@@ -92,75 +83,73 @@ cp debian/copyright %{buildroot}/usr/share/package-licenses/compat-libical-sonam
 pushd clr-build
 %make_install
 popd
+## Remove excluded files
+rm -f %{buildroot}/usr/lib64/cmake/LibIcal/LibIcalConfig.cmake
+rm -f %{buildroot}/usr/lib64/cmake/LibIcal/LibIcalConfigVersion.cmake
+rm -f %{buildroot}/usr/lib64/cmake/LibIcal/LibIcalTargets-relwithdebinfo.cmake
+rm -f %{buildroot}/usr/lib64/cmake/LibIcal/LibIcalTargets.cmake
+rm -f %{buildroot}/usr/include/libical/ical.h
+rm -f %{buildroot}/usr/include/libical/icalarray.h
+rm -f %{buildroot}/usr/include/libical/icalattach.h
+rm -f %{buildroot}/usr/include/libical/icalcalendar.h
+rm -f %{buildroot}/usr/include/libical/icalclassify.h
+rm -f %{buildroot}/usr/include/libical/icalcluster.h
+rm -f %{buildroot}/usr/include/libical/icalcomponent.h
+rm -f %{buildroot}/usr/include/libical/icalderivedparameter.h
+rm -f %{buildroot}/usr/include/libical/icalderivedproperty.h
+rm -f %{buildroot}/usr/include/libical/icalderivedvalue.h
+rm -f %{buildroot}/usr/include/libical/icaldirset.h
+rm -f %{buildroot}/usr/include/libical/icaldirsetimpl.h
+rm -f %{buildroot}/usr/include/libical/icalduration.h
+rm -f %{buildroot}/usr/include/libical/icalenums.h
+rm -f %{buildroot}/usr/include/libical/icalerror.h
+rm -f %{buildroot}/usr/include/libical/icalfileset.h
+rm -f %{buildroot}/usr/include/libical/icalfilesetimpl.h
+rm -f %{buildroot}/usr/include/libical/icalgauge.h
+rm -f %{buildroot}/usr/include/libical/icalgaugeimpl.h
+rm -f %{buildroot}/usr/include/libical/icallangbind.h
+rm -f %{buildroot}/usr/include/libical/icalmemory.h
+rm -f %{buildroot}/usr/include/libical/icalmessage.h
+rm -f %{buildroot}/usr/include/libical/icalmime.h
+rm -f %{buildroot}/usr/include/libical/icalparameter.h
+rm -f %{buildroot}/usr/include/libical/icalparameter_cxx.h
+rm -f %{buildroot}/usr/include/libical/icalparser.h
+rm -f %{buildroot}/usr/include/libical/icalperiod.h
+rm -f %{buildroot}/usr/include/libical/icalproperty.h
+rm -f %{buildroot}/usr/include/libical/icalproperty_cxx.h
+rm -f %{buildroot}/usr/include/libical/icalrecur.h
+rm -f %{buildroot}/usr/include/libical/icalrestriction.h
+rm -f %{buildroot}/usr/include/libical/icalset.h
+rm -f %{buildroot}/usr/include/libical/icalspanlist.h
+rm -f %{buildroot}/usr/include/libical/icalspanlist_cxx.h
+rm -f %{buildroot}/usr/include/libical/icalss.h
+rm -f %{buildroot}/usr/include/libical/icalssyacc.h
+rm -f %{buildroot}/usr/include/libical/icaltime.h
+rm -f %{buildroot}/usr/include/libical/icaltimezone.h
+rm -f %{buildroot}/usr/include/libical/icaltypes.h
+rm -f %{buildroot}/usr/include/libical/icaltz-util.h
+rm -f %{buildroot}/usr/include/libical/icalvalue.h
+rm -f %{buildroot}/usr/include/libical/icalvalue_cxx.h
+rm -f %{buildroot}/usr/include/libical/icalvcal.h
+rm -f %{buildroot}/usr/include/libical/icptrholder_cxx.h
+rm -f %{buildroot}/usr/include/libical/libical_ical_export.h
+rm -f %{buildroot}/usr/include/libical/libical_icalss_export.h
+rm -f %{buildroot}/usr/include/libical/libical_vcal_export.h
+rm -f %{buildroot}/usr/include/libical/pvl.h
+rm -f %{buildroot}/usr/include/libical/sspm.h
+rm -f %{buildroot}/usr/include/libical/vcaltmp.h
+rm -f %{buildroot}/usr/include/libical/vcc.h
+rm -f %{buildroot}/usr/include/libical/vcomponent_cxx.h
+rm -f %{buildroot}/usr/include/libical/vobject.h
+rm -f %{buildroot}/usr/lib64/libical.so
+rm -f %{buildroot}/usr/lib64/libical_cxx.so
+rm -f %{buildroot}/usr/lib64/libicalss.so
+rm -f %{buildroot}/usr/lib64/libicalss_cxx.so
+rm -f %{buildroot}/usr/lib64/libicalvcal.so
+rm -f %{buildroot}/usr/lib64/pkgconfig/libical.pc
 
 %files
 %defattr(-,root,root,-)
-
-%files dev
-%defattr(-,root,root,-)
-%exclude /usr/include/libical/ical.h
-%exclude /usr/include/libical/icalarray.h
-%exclude /usr/include/libical/icalattach.h
-%exclude /usr/include/libical/icalcalendar.h
-%exclude /usr/include/libical/icalclassify.h
-%exclude /usr/include/libical/icalcluster.h
-%exclude /usr/include/libical/icalcomponent.h
-%exclude /usr/include/libical/icalderivedparameter.h
-%exclude /usr/include/libical/icalderivedproperty.h
-%exclude /usr/include/libical/icalderivedvalue.h
-%exclude /usr/include/libical/icaldirset.h
-%exclude /usr/include/libical/icaldirsetimpl.h
-%exclude /usr/include/libical/icalduration.h
-%exclude /usr/include/libical/icalenums.h
-%exclude /usr/include/libical/icalerror.h
-%exclude /usr/include/libical/icalfileset.h
-%exclude /usr/include/libical/icalfilesetimpl.h
-%exclude /usr/include/libical/icalgauge.h
-%exclude /usr/include/libical/icalgaugeimpl.h
-%exclude /usr/include/libical/icallangbind.h
-%exclude /usr/include/libical/icalmemory.h
-%exclude /usr/include/libical/icalmessage.h
-%exclude /usr/include/libical/icalmime.h
-%exclude /usr/include/libical/icalparameter.h
-%exclude /usr/include/libical/icalparameter_cxx.h
-%exclude /usr/include/libical/icalparser.h
-%exclude /usr/include/libical/icalperiod.h
-%exclude /usr/include/libical/icalproperty.h
-%exclude /usr/include/libical/icalproperty_cxx.h
-%exclude /usr/include/libical/icalrecur.h
-%exclude /usr/include/libical/icalrestriction.h
-%exclude /usr/include/libical/icalset.h
-%exclude /usr/include/libical/icalspanlist.h
-%exclude /usr/include/libical/icalspanlist_cxx.h
-%exclude /usr/include/libical/icalss.h
-%exclude /usr/include/libical/icalssyacc.h
-%exclude /usr/include/libical/icaltime.h
-%exclude /usr/include/libical/icaltimezone.h
-%exclude /usr/include/libical/icaltypes.h
-%exclude /usr/include/libical/icaltz-util.h
-%exclude /usr/include/libical/icalvalue.h
-%exclude /usr/include/libical/icalvalue_cxx.h
-%exclude /usr/include/libical/icalvcal.h
-%exclude /usr/include/libical/icptrholder_cxx.h
-%exclude /usr/include/libical/libical_ical_export.h
-%exclude /usr/include/libical/libical_icalss_export.h
-%exclude /usr/include/libical/libical_vcal_export.h
-%exclude /usr/include/libical/pvl.h
-%exclude /usr/include/libical/sspm.h
-%exclude /usr/include/libical/vcaltmp.h
-%exclude /usr/include/libical/vcc.h
-%exclude /usr/include/libical/vcomponent_cxx.h
-%exclude /usr/include/libical/vobject.h
-%exclude /usr/lib64/cmake/LibIcal/LibIcalConfig.cmake
-%exclude /usr/lib64/cmake/LibIcal/LibIcalConfigVersion.cmake
-%exclude /usr/lib64/cmake/LibIcal/LibIcalTargets-relwithdebinfo.cmake
-%exclude /usr/lib64/cmake/LibIcal/LibIcalTargets.cmake
-%exclude /usr/lib64/libical.so
-%exclude /usr/lib64/libical_cxx.so
-%exclude /usr/lib64/libicalss.so
-%exclude /usr/lib64/libicalss_cxx.so
-%exclude /usr/lib64/libicalvcal.so
-%exclude /usr/lib64/pkgconfig/libical.pc
 
 %files lib
 %defattr(-,root,root,-)
